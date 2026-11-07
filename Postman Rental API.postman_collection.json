@@ -1,0 +1,139 @@
+{
+  "info": {
+    "_postman_id": "c0f1bb33-6976-4bdb-93a7-b5cc41de1cc8",
+    "name": "Rental Kendaraan API",
+    "description": "REST API dan GraphQL rental kendaraan lokal. Jalankan server terlebih dahulu dengan npm run dev.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseURL",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "pelangganId",
+      "value": "1"
+    },
+    {
+      "key": "kendaraanId",
+      "value": "1"
+    },
+    {
+      "key": "rentalId",
+      "value": "1"
+    },
+    {
+      "key": "createdRentalId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "REST",
+      "item": [
+        {
+          "name": "List penyewaan (GET)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const rows = pm.response.json();",
+                  "if (rows.length > 0) {",
+                  "  pm.collectionVariables.set('rentalId', rows[0].id);",
+                  "  pm.collectionVariables.set('pelangganId', rows[0].pelangganId);",
+                  "  pm.collectionVariables.set('kendaraanId', rows[0].kendaraanId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseURL}}/api/penyewaan"
+          }
+        },
+        {
+          "name": "Detail penyewaan (GET)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseURL}}/api/penyewaan/{{rentalId}}"
+          }
+        },
+        {
+          "name": "Buat penyewaan (POST)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('createdRentalId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pelangganId\": {{pelangganId}},\n  \"kendaraanId\": {{kendaraanId}},\n  \"totalBiaya\": 500019,\n  \"tanggalSewa\": \"2026-11-07T00:00:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseURL}}/api/penyewaan"
+          }
+        },
+        {
+          "name": "Hapus penyewaan yang dibuat (DELETE)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseURL}}/api/penyewaan/{{createdRentalId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "GraphQL",
+      "item": [
+        {
+          "name": "Daftar transaksi dan relasi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { penyewaan { tanggalSewa totalBiaya pelanggan { nama email } kendaraan { merk platNomor } } }\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseURL}}/graphql"
+          }
+        }
+      ]
+    }
+  ]
+}
